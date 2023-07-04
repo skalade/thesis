@@ -162,3 +162,9 @@ cython_debug/
 # binaries
 *.png
 *.svg
+
+# pytorch checkpoints
+*.pt
+
+# tex files
+*.tex
