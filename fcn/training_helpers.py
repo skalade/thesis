@@ -155,10 +155,8 @@ def train_model(model, optimizer, loss_fn, train_loader, val_loader, num_epochs=
             
     return model, losses, val_losses, train_accs, val_accs
     
-def test_baselines(preamble_seq, snr_range=None, num_iter=1500, payload=128, signal_length=200, random_offset=True, carrier_offset=None):
-    
-    if snr_range is None:
-        snr_range = np.arange(-15,10)
+def test_baselines(preamble_seq, snr_range, num_iter=1500, payload=128, signal_length=200, 
+                   random_offset=True, carrier_offset=None, add_channel=False, awgn_measured=True):
     
     preamble = np.where(preamble_seq < 1, -1+0j, 1+0j)
 
@@ -179,11 +177,21 @@ def test_baselines(preamble_seq, snr_range=None, num_iter=1500, payload=128, sig
             else:
                 tau = 40
 
-            if carrier_offset:
-                my_frame = awgn(phase_offset(create_frame(preamble_seq, payload=payload, signal_length=signal_length, offset=tau), offset=ph)*offset_sine, snr)
-            else:
-                my_frame = awgn(phase_offset(create_frame(preamble_seq, payload=payload, signal_length=signal_length, offset=tau), offset=ph), snr)
+            my_frame = create_frame(preamble_seq, payload=payload, signal_length=signal_length, offset=tau)
+
+            # Add phase offset
+            my_frame = phase_offset(my_frame, offset=ph)
+
+            if carrier_offset is not None:
+                my_frame = my_frame * offset_sine
             
+            if add_channel:
+                gains = 1/np.sqrt(2)*(np.random.normal(0)+1j*np.random.normal(0))
+                my_frame = gains*my_frame
+
+            # Finally, add awgn
+            my_frame = awgn(my_frame, snr, measured=awgn_measured)
+
             # Calculate baselines
             correlation = np.abs(np.correlate(my_frame, preamble, mode='valid'))
             y_corr = np.argmax(correlation)
@@ -203,7 +211,6 @@ def test_baselines(preamble_seq, snr_range=None, num_iter=1500, payload=128, sig
 
         corr_ers[idx] = corr_err
         expert_ers[idx] = expert_err
-
         
     corr_ders = corr_ers/num_iter
     expert_ders = expert_ers/num_iter
@@ -213,7 +220,7 @@ def test_baselines(preamble_seq, snr_range=None, num_iter=1500, payload=128, sig
 # Returns DER for given pytorch detector, make sure trained detector matches the
 # preamble you are testing against
 def test_detector(detector, preamble_seq, snr_range=None, num_iter=1500, payload=128, signal_length=200, add_channel=False, 
-             abs_phase=False, tau=None, plot=True, add_phase_offset=True, normalize=True, carrier_offset=None):
+             abs_phase=False, tau=None, plot=True, add_phase_offset=True, normalize=True, carrier_offset=None, awgn_measured=True):
     
     if snr_range is None:
         snr_range = np.arange(-10,15)
@@ -244,7 +251,7 @@ def test_detector(detector, preamble_seq, snr_range=None, num_iter=1500, payload
                 my_frame = gains*my_frame
                 
             # Add noise
-            my_frame = awgn(my_frame, snr)
+            my_frame = awgn(my_frame, snr, measured=awgn_measured)
             
             # normalize
             if normalize:
