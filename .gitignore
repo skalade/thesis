@@ -168,3 +168,7 @@ cython_debug/
 
 # tex files
 *.tex
+
+# numpy saves
+*.npz
+*.npy
