@@ -14,6 +14,10 @@ Software versions used to run all the notebooks:
 * PyTorch 1.10
 * CUDA 10.1
 
+Optional:
+
+* MATLAB 2021b (matlab python engine required for some multipath fading channel evaluations)
+
 I might update these to more up-to-date versions at some point, but this is what the original results were obtained with. That said, all the code *should* still run on later versions of PyTorch.
 
 **I highly recommend running the training notebooks with a GPU.** Even on my 1080ti the Seq2Seq models take days to train. Don't attempt on CPU. The great thing about Jupyter notebooks is that they typically render pretty well on github and you can view the code/results without actually running anything.
