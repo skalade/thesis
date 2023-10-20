@@ -4,7 +4,7 @@
 
 This repository contains sets of notebooks and scripts used to reproduce the results of my thesis "Deep Learning for Wireless Communications: Flexible Architectures and Multitask Learning". 
 
-Proper software people, avert your eyes, the code is riddled with copies of functions and global variables, and I'm sure there's other bad practices you can find in here... I did try to make this as reproducible as possible however, locked down random seeds, etc. I hope at least some of this will be useful for fellow future researchers going down the path I had decided to embark upon so long ago.
+The work is meant to be reproducible, the notebooks have random seeds locked down, etc. I hope at least some of this will be useful for fellow future researchers going down the path I had decided to embark upon so long ago.
 
 ## Prerequisites
 
